@@ -1,0 +1,63 @@
+version: "3.9"
+
+services:
+  api:
+    build: ./api
+    container_name: weather_api
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/weather
+    networks:
+      - appnet
+
+  frontend:
+    build: ./frontend
+    container_name: weather_frontend
+    ports:
+      - "5173:5173"
+    networks:
+      - appnet
+
+  collector:
+    build: ./collector
+    container_name: weather_collector
+    depends_on:
+      - rabbitmq
+    networks:
+      - appnet
+
+  worker:
+    build: ./worker
+    container_name: weather_worker
+    depends_on:
+      - rabbitmq
+    networks:
+      - appnet
+
+  mongo:
+    image: mongo:6
+    container_name: weather_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - appnet
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: weather_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - appnet
+
+volumes:
+  mongo_data:
+
+networks:
+  appnet:
