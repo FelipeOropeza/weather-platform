@@ -25,7 +25,8 @@ services:
     build: ./collector
     container_name: weather_collector
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     networks:
       - appnet
 
@@ -33,7 +34,10 @@ services:
     build: ./worker
     container_name: weather_worker
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
+      api:
+        condition: service_started
     networks:
       - appnet
 
@@ -53,6 +57,11 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     networks:
       - appnet
 
