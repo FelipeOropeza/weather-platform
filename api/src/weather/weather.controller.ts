@@ -17,4 +17,9 @@ export class WeatherController {
   async findAll() {
     return this.weatherService.findAll();
   }
+
+  @Get('teste')
+  async teste() {
+    return { message: 'API is working!' };
+  }
 }
