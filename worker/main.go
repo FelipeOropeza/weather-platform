@@ -1,3 +1,4 @@
+// main.go
 package main
 
 import (
@@ -38,7 +39,14 @@ func main() {
 			continue
 		}
 
-		_, err = ch.QueueDeclare(queue, true, false, false, false, nil)
+		_, err = ch.QueueDeclare(
+			queue, // name
+			true,  // durable
+			false, // autoDelete
+			false, // exclusive
+			false, // noWait
+			nil,   // args
+		)
 		if err != nil {
 			log.Println("❌ Erro ao declarar fila. Reconectando...")
 			ch.Close()
@@ -46,13 +54,12 @@ func main() {
 			continue
 		}
 
-		log.Println("🚀 Iniciando consumidor...")
+		log.Println("🚀 Iniciando consumer...")
 		StartConsumer(ch, queue)
 
 		log.Println("⚠️ Consumer caiu. Reiniciando conexão...")
 		ch.Close()
 		conn.Close()
 		time.Sleep(2 * time.Second)
-
 	}
 }

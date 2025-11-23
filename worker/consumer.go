@@ -1,27 +1,46 @@
+// consumer.go
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
+// Estrutura do JSON do Python
 type WeatherData struct {
 	Temperature float64 `json:"temperature"`
 	Humidity    float64 `json:"humidity"`
-	WindSpeed   float64 `json:"wind_speed"`
+	WindSpeed   float64 `json:"windspeed"`                  // nome igual do Python
 	Condition   string  `json:"condition"`
-	RainChance  float64 `json:"rain_chance"`
+	RainChance  float64 `json:"precipitation_probability"`   // nome igual do Python
 	Timestamp   string  `json:"timestamp"`
 }
 
-func StartConsumer(ch *amqp.Channel, queueName string) {
+// Função para envio futuro para a API NestJS
+func sendToAPI(data WeatherData) error {
+	jsonData, _ := json.Marshal(data)
+	resp, err := http.Post("http://localhost:3000/api/weather/logs", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 400 {
+		return fmt.Errorf("erro na API: %v", resp.Status)
+	}
+	return nil
+}
 
+// Consumer
+func StartConsumer(ch *amqp.Channel, queueName string) {
 	msgs, err := ch.Consume(
 		queueName,
-		"",
-		false,
+		"",    // consumer
+		false, // autoAck false para controlar ack/nack
 		false,
 		false,
 		false,
@@ -37,12 +56,14 @@ func StartConsumer(ch *amqp.Channel, queueName string) {
 	for msg := range msgs {
 		var data WeatherData
 
+		// Valida JSON
 		if err := json.Unmarshal(msg.Body, &data); err != nil {
 			log.Println("❌ JSON inválido:", err)
-			msg.Nack(false, false)
+			msg.Nack(false, false) // descarta
 			continue
 		}
 
+		// Mostra no console
 		log.Println("🌤️  Dados recebidos:")
 		log.Println("  • Temperatura:", data.Temperature)
 		log.Println("  • Umidade:", data.Humidity)
@@ -52,6 +73,16 @@ func StartConsumer(ch *amqp.Channel, queueName string) {
 		log.Println("  • Timestamp:", data.Timestamp)
 		log.Println("-----------------------------------")
 
+		// Futuro: enviar para API
+		/*
+		if err := sendToAPI(data); err != nil {
+			log.Println("❌ Erro ao enviar para API:", err)
+			msg.Nack(false, true) // requeue
+			continue
+		}
+		*/
+
+		// Confirma mensagem
 		msg.Ack(false)
 	}
 

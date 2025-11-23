@@ -1,49 +1,30 @@
 import schedule
 import time
+from datetime import datetime
 from weather_service import WeatherService
 from queue_service import QueueService
 import pika
 import os
 
-# São Paulo (depois você coloca sua cidade real)
-LAT = -23.55
-LON = -46.63
+LAT = float(os.getenv("LATITUDE", "-23.55"))
+LON = float(os.getenv("LONGITUDE", "-46.63"))
 
-weather = WeatherService(latitude=LAT, longitude=LON)
-
-queue = None
-
-def connect_queue():
-    global queue
-    while True:
-        try:
-            queue = QueueService()  # tenta conectar
-            print("🐇 Conectado ao RabbitMQ!")
-            return
-        except pika.exceptions.AMQPConnectionError:
-            print("❌ RabbitMQ indisponível. Tentando novamente em 5s...")
-            time.sleep(5)
-
+weather_service = WeatherService(LAT, LON)
+queue_service = QueueService()
 
 def job():
-    global queue
-
     try:
-        data = weather.fetch_weather()
-        queue.send(data)
-        print("✔ Dados coletados e enviados!")
-
-    except pika.exceptions.AMQPConnectionError:
-        print("⚠️ Perdi conexão com RabbitMQ. Reconectando...")
-        connect_queue()
+        data = weather_service.fetch_weather()
+        queue_service.send(data)
+        print(f"✔ Coleta realizada em {datetime.now()}")
     except Exception as e:
-        print("❌ Erro ao enviar dados:", e)
+        print("❌ Erro na coleta ou envio:", e)
 
+print("🚀 Python Weather Collector iniciado!")
+schedule.every(1).minutes.do(job)  # produção: 1 hora
+# schedule.every(1).minutes.do(job)  # teste rápido
 
-print("🚀 Python Collector iniciado!")
-connect_queue()
-
-schedule.every(1).minutes.do(job)  # para testes
+job()  # roda imediatamente na inicialização
 
 while True:
     schedule.run_pending()
