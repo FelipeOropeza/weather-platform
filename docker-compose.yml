@@ -8,10 +8,10 @@ services:
       - "3000:3000"
     depends_on:
       - mongo
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/weather
     networks:
       - appnet
+    env_file:
+      - ./api/.env
 
   frontend:
     build: ./frontend
@@ -29,6 +29,8 @@ services:
         condition: service_healthy
     networks:
       - appnet
+    env_file:
+      - ./collector/.env
 
   worker:
     build: ./worker
@@ -40,6 +42,8 @@ services:
         condition: service_started
     networks:
       - appnet
+    env_file:
+      - ./worker/.env
 
   mongo:
     image: mongo:6

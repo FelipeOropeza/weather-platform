@@ -13,13 +13,14 @@ type ApiClient struct {
 }
 
 func NewApiClient() *ApiClient {
-	return &ApiClient{
-		baseURL: os.Getenv("API_URL"),
+	url := os.Getenv("API_URL")
+	if url == "" {
+		url = "http://localhost:3000/api/weather/logs"
 	}
+	return &ApiClient{baseURL: url}
 }
 
 func (c *ApiClient) SendToAPI(data WeatherData) error {
-
 	body, _ := json.Marshal(data)
 
 	resp, err := http.Post(c.baseURL, "application/json", bytes.NewBuffer(body))
@@ -31,6 +32,5 @@ func (c *ApiClient) SendToAPI(data WeatherData) error {
 	if resp.StatusCode >= 400 {
 		return errors.New("API retornou erro")
 	}
-
 	return nil
 }
