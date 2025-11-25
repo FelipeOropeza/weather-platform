@@ -21,7 +21,7 @@ def job():
         print("❌ Erro na coleta ou envio:", e)
 
 print("🚀 Python Weather Collector iniciado!")
-schedule.every(1).minutes.do(job)  # produção: 1 hora
+schedule.every(10).minutes.do(job)  # produção: 1 hora
 # schedule.every(1).minutes.do(job)  # teste rápido
 
 job()  # roda imediatamente na inicialização

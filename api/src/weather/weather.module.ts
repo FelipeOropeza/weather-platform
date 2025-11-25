@@ -19,5 +19,6 @@ import { WeatherLog, WeatherLogSchema } from './schemas/weather-log.schema';
   ],
   controllers: [WeatherController],
   providers: [WeatherService],
+  exports: [WeatherService],
 })
 export class WeatherModule {}
