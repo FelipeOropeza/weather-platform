@@ -1,23 +1,25 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import WeatherCards from '@/components/WeatherCards.vue'
 import WeatherTable from '@/components/WeatherTable.vue'
 import WeatherInsights from '@/components/WeatherInsights.vue'
 import {
-  getCurrentWeather,
-  getWeatherHistory,
+  getWeatherLogs,
   getWeatherInsights,
   exportWeatherCsv,
   exportWeatherXlsx,
-  type CurrentWeather,
-  type WeatherRecord,
+  type WeatherLog,
   type WeatherInsight,
 } from '@/api/weather'
 
-const current = ref<CurrentWeather | null>(null)
-const records = ref<WeatherRecord[]>([])
+const logs = ref<WeatherLog[]>([])
+
+const current = computed(() =>
+  logs.value.length ? logs.value[logs.value.length - 1] : null,
+)
+
 const insights = ref<WeatherInsight[]>([])
 
 const loadingCurrent = ref(false)
@@ -29,14 +31,13 @@ const loadData = async () => {
   loadingHistory.value = true
   loadingInsights.value = true
   try {
-    const [c, h, i] = await Promise.all([
-      getCurrentWeather(),
-      getWeatherHistory(),
+    const [logsResponse, insightsResponse] = await Promise.all([
+      getWeatherLogs(),
       getWeatherInsights(),
     ])
-    current.value = c
-    records.value = h
-    insights.value = i
+
+    logs.value = logsResponse
+    insights.value = insightsResponse
   } catch (err) {
     console.error('Erro ao carregar dados de clima', err)
   } finally {
@@ -88,6 +89,7 @@ onMounted(loadData)
         </div>
       </header>
 
+      <!-- Cards usam o "current" calculado a partir do último log -->
       <WeatherCards :current="current" :loading="loadingCurrent" />
 
       <div class="grid gap-6 md:grid-cols-3">
@@ -96,7 +98,8 @@ onMounted(loadData)
             <CardTitle>Registros recentes de clima</CardTitle>
           </CardHeader>
           <CardContent>
-            <WeatherTable :records="records" :loading="loadingHistory" />
+            <!-- Tabela recebe todos os logs -->
+            <WeatherTable :records="logs" :loading="loadingHistory" />
           </CardContent>
         </Card>
 
