@@ -10,7 +10,8 @@ defineProps<{
 
 <template>
   <div class="grid gap-4 md:grid-cols-4">
-    <Card v-for="card in 4" :key="card" v-if="loading">
+    <!-- Skeleton -->
+    <Card v-for="n in 4" :key="n" v-if="loading">
       <CardHeader>
         <CardTitle class="h-4 w-24 animate-pulse bg-muted rounded" />
       </CardHeader>
@@ -19,6 +20,7 @@ defineProps<{
       </CardContent>
     </Card>
 
+    <!-- Cards -->
     <template v-else-if="current">
       <Card>
         <CardHeader>
@@ -58,7 +60,7 @@ defineProps<{
           <CardTitle>Condição</CardTitle>
         </CardHeader>
         <CardContent>
-          <p class="text-xl font-semibold">
+          <p class="text-xl font-semibold capitalize">
             {{ current.condition }}
           </p>
           <p class="text-sm text-muted-foreground">

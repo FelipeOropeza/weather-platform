@@ -2,13 +2,20 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000', // ajuste se seu Nest estiver em outra porta
+  baseURL: 'http://localhost:3000',
 })
 
-// ajuste esses tipos conforme o seu schema/DTO real
 export interface WeatherLog {
   id: string
   createdAt: string
+  location: string
+  condition: string
+  temperature: number
+  humidity: number
+  windSpeed: number
+}
+
+export interface CurrentWeather {
   location: string
   condition: string
   temperature: number
@@ -32,13 +39,28 @@ export interface CreateWeatherLogDto {
   windSpeed: number
 }
 
-// GET /api/weather/logs  -> lista de logs
+
+function mapCurrentWeather(data: any): CurrentWeather {
+  return {
+    location: data.location ?? '—',
+    condition: data.condition ?? '—',
+    temperature: Number(data.temperature ?? 0),
+    humidity: Number(data.humidity ?? 0),
+    windSpeed: Number(data.windspeed ?? 0),
+  }
+}
+
+
+export async function getCurrentWeather(): Promise<CurrentWeather> {
+  const { data } = await api.get('/api/weather/current')
+  return mapCurrentWeather(data)
+}
+
 export async function getWeatherLogs(): Promise<WeatherLog[]> {
   const { data } = await api.get('/api/weather/logs')
   return data
 }
 
-// POST /api/weather/logs -> criar um novo log
 export async function createWeatherLog(
   payload: CreateWeatherLogDto,
 ): Promise<WeatherLog> {
@@ -46,13 +68,11 @@ export async function createWeatherLog(
   return data
 }
 
-// GET /api/weather/insights
 export async function getWeatherInsights(): Promise<WeatherInsight[]> {
   const { data } = await api.get('/api/weather/insights')
   return data
 }
 
-// GET /api/weather/export.csv
 export async function exportWeatherCsv(): Promise<void> {
   const { data } = await api.get('/api/weather/export.csv', {
     responseType: 'blob',
@@ -66,7 +86,6 @@ export async function exportWeatherCsv(): Promise<void> {
   link.remove()
 }
 
-// GET /api/weather/export.xlsx
 export async function exportWeatherXlsx(): Promise<void> {
   const { data } = await api.get('/api/weather/export.xlsx', {
     responseType: 'blob',

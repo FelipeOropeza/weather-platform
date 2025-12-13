@@ -14,11 +14,24 @@ import {
   type WeatherInsight,
 } from '@/api/weather'
 
+import type { CurrentWeather } from '@/api/weather'
+
+
 const logs = ref<WeatherLog[]>([])
 
-const current = computed(() =>
-  logs.value.length ? logs.value[logs.value.length - 1] : null,
-)
+const current = computed<CurrentWeather | null>(() => {
+  if (logs.value.length === 0) return null
+
+  const last = logs.value[logs.value.length - 1]!
+  return {
+    location: last.location,
+    condition: last.condition,
+    temperature: last.temperature,
+    humidity: last.humidity,
+    windSpeed: last.windSpeed,
+  }
+})
+
 
 const insights = ref<WeatherInsight[]>([])
 
@@ -26,17 +39,31 @@ const loadingCurrent = ref(false)
 const loadingHistory = ref(false)
 const loadingInsights = ref(false)
 
+function normalizeWeatherLog(apiLog: any): WeatherLog {
+  return {
+    id: apiLog._id ?? apiLog.id,
+    createdAt: apiLog.timestamp ?? apiLog.createdAt,
+    location: apiLog.location ?? '—',
+    condition: apiLog.condition ?? '—',
+    temperature: Number(apiLog.temperature ?? 0),
+    humidity: Number(apiLog.humidity ?? 0),
+    windSpeed: Number(apiLog.windspeed ?? 0), // 🔥 CORREÇÃO
+  }
+}
+
+
 const loadData = async () => {
   loadingCurrent.value = true
   loadingHistory.value = true
   loadingInsights.value = true
+
   try {
     const [logsResponse, insightsResponse] = await Promise.all([
       getWeatherLogs(),
       getWeatherInsights(),
     ])
 
-    logs.value = logsResponse
+    logs.value = logsResponse.map(normalizeWeatherLog)
     insights.value = insightsResponse
   } catch (err) {
     console.error('Erro ao carregar dados de clima', err)
@@ -46,6 +73,7 @@ const loadData = async () => {
     loadingInsights.value = false
   }
 }
+
 
 const handleExportCsv = async () => {
   try {

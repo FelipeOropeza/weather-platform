@@ -7,10 +7,10 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { WeatherRecord } from '@/api/weather'
+import type { WeatherLog } from '@/api/weather'
 
 defineProps<{
-  records: WeatherRecord[]
+  records: WeatherLog[]
   loading: boolean
 }>()
 </script>
@@ -39,7 +39,7 @@ defineProps<{
           </TableCell>
         </TableRow>
         <TableRow v-else v-for="row in records" :key="row.id">
-          <TableCell>{{ new Date(row.datetime).toLocaleString() }}</TableCell>
+          <TableCell>{{ new Date(row.createdAt).toLocaleString() }}</TableCell>
           <TableCell>{{ row.location }}</TableCell>
           <TableCell>{{ row.condition }}</TableCell>
           <TableCell>{{ row.temperature.toFixed(1) }}</TableCell>
