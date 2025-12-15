@@ -23,20 +23,11 @@ export interface CurrentWeather {
   windSpeed: number
 }
 
-export interface WeatherInsight {
-  id: string
-  title: string
-  description?: string
-  severity?: 'info' | 'warning' | 'danger'
-  score?: number
-}
-
-export interface CreateWeatherLogDto {
-  location: string
-  condition: string
-  temperature: number
-  humidity: number
-  windSpeed: number
+export interface WeatherSummary {
+  avgTemperature: number
+  highestRainChance: number
+  windyDays: number
+  totalRecords: number
 }
 
 
@@ -61,14 +52,7 @@ export async function getWeatherLogs(): Promise<WeatherLog[]> {
   return data
 }
 
-export async function createWeatherLog(
-  payload: CreateWeatherLogDto,
-): Promise<WeatherLog> {
-  const { data } = await api.post('/api/weather/logs', payload)
-  return data
-}
-
-export async function getWeatherInsights(): Promise<WeatherInsight[]> {
+export async function getWeatherInsights(): Promise<WeatherSummary> {
   const { data } = await api.get('/api/weather/insights')
   return data
 }

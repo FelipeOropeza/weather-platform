@@ -11,7 +11,7 @@ import {
   exportWeatherCsv,
   exportWeatherXlsx,
   type WeatherLog,
-  type WeatherInsight,
+  type WeatherSummary,
 } from '@/api/weather'
 
 import type { CurrentWeather } from '@/api/weather'
@@ -22,7 +22,7 @@ const logs = ref<WeatherLog[]>([])
 const current = computed<CurrentWeather | null>(() => {
   if (logs.value.length === 0) return null
 
-  const last = logs.value[logs.value.length - 1]!
+  const last = logs.value[0]!
   return {
     location: last.location,
     condition: last.condition,
@@ -33,7 +33,7 @@ const current = computed<CurrentWeather | null>(() => {
 })
 
 
-const insights = ref<WeatherInsight[]>([])
+const insights = ref<WeatherSummary | null>(null)
 
 const loadingCurrent = ref(false)
 const loadingHistory = ref(false)
@@ -47,7 +47,7 @@ function normalizeWeatherLog(apiLog: any): WeatherLog {
     condition: apiLog.condition ?? '—',
     temperature: Number(apiLog.temperature ?? 0),
     humidity: Number(apiLog.humidity ?? 0),
-    windSpeed: Number(apiLog.windspeed ?? 0), // 🔥 CORREÇÃO
+    windSpeed: Number(apiLog.windspeed ?? 0),
   }
 }
 
@@ -64,7 +64,7 @@ const loadData = async () => {
     ])
 
     logs.value = logsResponse.map(normalizeWeatherLog)
-    insights.value = insightsResponse
+    insights.value = insightsResponse as WeatherSummary
   } catch (err) {
     console.error('Erro ao carregar dados de clima', err)
   } finally {
