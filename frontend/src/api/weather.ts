@@ -1,9 +1,4 @@
-// src/api/weather.ts
-import axios from 'axios'
-
-const api = axios.create({
-  baseURL: 'http://localhost:3000',
-})
+import api from '@/api/api'
 
 export interface WeatherLog {
   id: string
