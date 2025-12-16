@@ -16,15 +16,13 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: (state) => !!state.token,
   },
 
-  actions: {
-    login(token: string, user?: User) {
+   actions: {
+    login(token: string, user: User) {
       this.token = token
-      this.user = user ?? null
+      this.user = user
 
       localStorage.setItem('token', token)
-      if (user) {
-        localStorage.setItem('user', JSON.stringify(user))
-      }
+      localStorage.setItem('user', JSON.stringify(user))
     },
 
     logout() {

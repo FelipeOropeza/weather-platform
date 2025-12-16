@@ -25,7 +25,7 @@ const handleLogin = async () => {
     password: password.value,
   })
 
-  auth.login(res.access_token)
+  auth.login(res.access_token, res.user)
   router.push('/dashboard')
 }
 

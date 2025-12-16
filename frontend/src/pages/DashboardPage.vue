@@ -104,31 +104,41 @@ onMounted(loadData);
   <main class="min-h-screen bg-background text-foreground">
     <div class="container mx-auto py-8 space-y-6">
       <header
-        class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between"
+        class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between"
       >
-        <div>
+        <div class="space-y-1">
           <h1 class="text-2xl font-bold">Dashboard de Clima</h1>
           <p class="text-sm text-muted-foreground">
             Dados reais da sua região + insights de IA gerados a partir do
             pipeline de clima.
           </p>
         </div>
-        <div class="flex items-center gap-4">
-          <span class="text-sm text-muted-foreground">
-            Olá,
-            <strong>{{
-              auth.user?.name ?? auth.user?.email ?? "Usuário"
-            }}</strong>
-          </span>
-          <Button variant="outline" @click="handleExportCsv">
-            Exportar CSV
-          </Button>
-          <Button variant="outline" @click="handleExportXlsx">
-            Exportar XLSX
-          </Button>
-          <Button @click="loadData"> Atualizar </Button>
 
-          <Button variant="outline" @click="handleLogout"> Sair </Button>
+        <div class="flex flex-wrap items-center gap-3">
+          <div
+            class="flex items-center gap-2 rounded-md border px-3 py-1 text-sm"
+          >
+            <span class="text-muted-foreground">Olá,</span>
+            <strong class="font-medium">
+              {{ auth.user?.name ?? auth.user?.email ?? "Usuário" }}
+            </strong>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" @click="handleExportCsv">
+              Exportar CSV
+            </Button>
+
+            <Button variant="outline" size="sm" @click="handleExportXlsx">
+              Exportar XLSX
+            </Button>
+
+            <Button size="sm" @click="loadData"> Atualizar </Button>
+
+            <Button variant="destructive" size="sm" @click="handleLogout">
+              Sair
+            </Button>
+          </div>
         </div>
       </header>
 
