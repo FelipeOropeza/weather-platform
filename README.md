@@ -25,3 +25,7 @@ docker compose up --build
 - Exibir no dashboard React
 - Gerar insights com IA
 - Exportar CSV/XLSX
+
+## Imagem do Esquema do Projeto
+
+![Mapa Projeto](https://github.com/user-attachments/assets/b2714b21-0af0-498c-8231-bff66a82dedb)
