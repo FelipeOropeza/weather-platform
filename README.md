@@ -4,7 +4,7 @@ Sistema completo de coleta, processamento, armazenamento e visualização de dad
 
 ## 🧱 Stack
 
-- **Frontend:** React + Vite + Tailwind + shadcn/ui
+- **Frontend:** Vue + Vite + Tailwind + shadcn/ui
 - **Backend:** NestJS
 - **Banco:** MongoDB
 - **Fila:** RabbitMQ
