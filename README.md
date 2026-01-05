@@ -22,7 +22,7 @@ docker compose up --build
 - Enviar para o RabbitMQ
 - Processar no worker Go
 - Armazenar no Mongo via API NestJS
-- Exibir no dashboard React
+- Exibir no dashboard Vue
 - Gerar insights com IA
 - Exportar CSV/XLSX
 
